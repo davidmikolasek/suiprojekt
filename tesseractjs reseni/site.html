@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR s Tesseract.js</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.4/dist/tesseract.min.js"></script>
+</head>
+<body>
+    <h1>OCR s Tesseract.js</h1>
+    <input type="file" id="imageUpload" accept="image/*">
+    <p id="status"></p>
+    <p id="result"></p>
+
+    <script>
+        document.getElementById('imageUpload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function() {
+                    Tesseract.recognize(
+                        reader.result,
+                        'eng', // můžete zde specifikovat jiný jazyk nebo přidat více jazyků
+                        {
+                            logger: m => {
+                                document.getElementById('status').innerText = m.status + ' ' + (m.progress * 100).toFixed(2) + '%';
+                            }
+                        }
+                    ).then(({ data: { text } }) => {
+                        document.getElementById('result').innerText = text;
+                    }).catch(err => {
+                        console.error(err);
+                        document.getElementById('status').innerText = 'Nastala chyba při rozpoznávání textu.';
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>
